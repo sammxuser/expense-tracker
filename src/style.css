@@ -107,3 +107,6 @@ td button:hover {
 .summary span {
   font-weight: bold;
 }
+.delete-btn {
+  background-color: red;
+}

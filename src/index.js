@@ -17,14 +17,16 @@ const transactionHistory = document.getElementById('transaction-history');
 
 addExpenseBtn.addEventListener('click', () => {
   if (
-    expenseDescription.value !== '' ||
-    // expenseCategory.value !== '' ||
-    expenseAmount.value !== ''
+    expenseDescription.value === '' ||
+    expenseAmount.value === '' ||
+    expenseAmount.value.trim() < 0
   ) {
+    alert('Enter values for Description and Amount');
+  } else {
     addTransactions(
-      expenseDescription.value,
-      expenseCategory.value,
-      expenseAmount.value,
+      expenseDescription.value.trim(),
+      expenseCategory.value.trim(),
+      expenseAmount.value.trim(),
       'expense'
     );
     expenseDescription.value = '';
@@ -37,12 +39,21 @@ addExpenseBtn.addEventListener('click', () => {
 });
 
 addIncomeBtn.addEventListener('click', () => {
-  addTransactions(
-    incomeDescription.value,
-    'income',
-    incomeAmount.value,
-    'income'
-  );
+  if (
+    incomeAmount.value === '' ||
+    incomeDescription.value === '' ||
+    incomeAmount.value <= 0
+    //|| isNaN(parseFloat(incomeAmount.value.trim()))
+  ) {
+    alert('Enter values for Description and Amount');
+  } else {
+    addTransactions(
+      incomeDescription.value.trim(),
+      'income',
+      incomeAmount.value.trim(),
+      'income'
+    );
+  }
   incomeAmount.value = '';
   incomeDescription.value = '';
 });
@@ -58,7 +69,10 @@ function addTransactions(description, category = '', amount, type) {
   const typeColumn = document.createElement('td');
   typeColumn.textContent = type;
   const actionColumn = document.createElement('td');
-  actionColumn.textContent = 'Edit/Delete';
+  const deleteBtn = document.createElement('button');
+  deleteBtn.classList.add('delete-btn');
+  deleteBtn.textContent = 'delete';
+  actionColumn.appendChild(deleteBtn);
 
   transRow.appendChild(descColumn);
   transRow.appendChild(categColumn);
@@ -67,6 +81,28 @@ function addTransactions(description, category = '', amount, type) {
   transRow.appendChild(actionColumn);
 
   transactionHistory.appendChild(transRow);
+  // add delete functionality
+  transactionHistory
+    .querySelector('.delete-btn')
+    .addEventListener('click', () => {
+      transRow.remove();
+      updateSummary();
+    });
+
+  updateSummary();
+}
+
+// clearAll button
+clearAllBtn.addEventListener('click', () => {
+  while (transactionHistory.rows.length > 0) {
+    transactionHistory.deleteRow(0);
+  }
+  totalExpenses.textContent = 0;
+  totalIncome.textContent = 0;
+  balance.textContent = 0;
+});
+
+function updateSummary() {
   // Calculate balance
   let runningBal = 0.0;
   let totIncome = 0.0; //total income
@@ -92,13 +128,3 @@ function addTransactions(description, category = '', amount, type) {
   totalExpenses.textContent = totExpense;
   balance.textContent = runningBal;
 }
-
-// clearAll button
-clearAllBtn.addEventListener('click', () => {
-  while (transactionHistory.rows.length > 0) {
-    transactionHistory.deleteRow(0);
-  }
-  totalExpenses.textContent = 0;
-  totalIncome.textContent = 0;
-  balance.textContent = 0;
-});
