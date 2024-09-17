@@ -84,15 +84,6 @@ function addTransactions(description, category = '', amount, type) {
   transRow.appendChild(actionColumn);
 
   transactionHistory.appendChild(transRow);
-  // add delete functionality
-  //   document
-  //     .getElementById('row#' + noOfTransactions)
-  //     .addEventListener('click', (element) => {
-  //       console.log(element.closest('tr').rowIndex);
-  //       transRow.remove();
-  //       updateSummary();
-  //     });
-
   deleteBtn.addEventListener('click', (element) => {
     // console.log(element.target.parentNode.parentNode.rowIndex);
     const rowNumber = element.target.parentNode.parentNode.rowIndex;
@@ -101,10 +92,9 @@ function addTransactions(description, category = '', amount, type) {
         transactionHistory.deleteRow(-1);
       } else transactionHistory.deleteRow(rowNumber - 1);
     }
-
     updateSummary();
   });
-
+  showNotification('Transaction added successfully!');
   updateSummary();
 }
 
@@ -139,8 +129,26 @@ function updateSummary() {
       }
     }
   }
+  // add color codes for balances
+  if (parseFloat(runningBal) >= 0) {
+    balance.classList.remove('negative');
+    balance.classList.add('positive');
+  } else {
+    balance.classList.remove('positive');
+    balance.classList.add('negative');
+  }
 
   totalIncome.textContent = totIncome;
   totalExpenses.textContent = totExpense;
   balance.textContent = runningBal;
+}
+
+function showNotification(message) {
+  const notification = document.getElementById('notification');
+  notification.textContent = message;
+  notification.classList.remove('hidden');
+
+  setTimeout(function () {
+    notification.classList.add('hidden');
+  }, 2000);
 }

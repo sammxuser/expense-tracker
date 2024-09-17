@@ -110,3 +110,20 @@ td button:hover {
 .delete-btn {
   background-color: red;
 }
+#notification {
+  background-color: #28a745;
+  color: white;
+  padding: 10px;
+  margin-top: 10px;
+  text-align: center;
+  border-radius: 5px;
+}
+.hidden {
+  display: none;
+}
+.positive {
+  color: #28a745; /* Green for positive balance */
+}
+.negative {
+  color: #dc3545; /* Red for negative balance */
+}
