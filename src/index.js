@@ -59,6 +59,18 @@ addIncomeBtn.addEventListener('click', () => {
 });
 
 function addTransactions(description, category = '', amount, type) {
+  // save data to localStorage to preserve data after page is refreshed
+  const transaction = {
+    description: description,
+    amount: amount,
+    category: category,
+    type: type,
+  };
+
+  let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  transactions.push(transaction);
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+
   let noOfTransactions = transactionHistory.rows.length;
   noOfTransactions += 1;
   const transRow = document.createElement('tr');
@@ -86,6 +98,8 @@ function addTransactions(description, category = '', amount, type) {
   transactionHistory.appendChild(transRow);
   deleteBtn.addEventListener('click', (element) => {
     // console.log(element.target.parentNode.parentNode.rowIndex);
+    console.log(element.target.parentNode.parentNode[0]);
+    // removeTransaction(element.target.parentNode.parentNode)
     const rowNumber = element.target.parentNode.parentNode.rowIndex;
     if (rowNumber > 0) {
       if (rowNumber === 1) {
@@ -152,3 +166,33 @@ function showNotification(message) {
     notification.classList.add('hidden');
   }, 2000);
 }
+
+// function to handle deletion of data from localStorage
+function removeTransaction(transactionToRemove) {
+  let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  transactions = transactions.filter(function (transaction) {
+    return !(
+      transaction.description === transactionToRemove.description &&
+      transaction.amount === transactionToRemove.amount &&
+      transaction.category === transactionToRemove.category &&
+      transaction.type === transactionToRemove.type
+    );
+  });
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+}
+
+// function to load saved transactions when page is loaded
+function loadTransactions() {
+  const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+  transactions.forEach((transaction) => {
+    addTransactions(
+      transaction.description,
+      transaction.category,
+      transaction.amount,
+      transaction.type
+    );
+  });
+  updateSummary();
+}
+window.addEventListener('load', loadTransactions);
