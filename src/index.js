@@ -59,7 +59,10 @@ addIncomeBtn.addEventListener('click', () => {
 });
 
 function addTransactions(description, category = '', amount, type) {
+  let noOfTransactions = transactionHistory.rows.length;
+  noOfTransactions += 1;
   const transRow = document.createElement('tr');
+  transRow.id = 'row#' + noOfTransactions;
   const descColumn = document.createElement('td');
   descColumn.textContent = description;
   const categColumn = document.createElement('td');
@@ -82,12 +85,25 @@ function addTransactions(description, category = '', amount, type) {
 
   transactionHistory.appendChild(transRow);
   // add delete functionality
-  transactionHistory
-    .querySelector('.delete-btn')
-    .addEventListener('click', () => {
-      transRow.remove();
-      updateSummary();
-    });
+  //   document
+  //     .getElementById('row#' + noOfTransactions)
+  //     .addEventListener('click', (element) => {
+  //       console.log(element.closest('tr').rowIndex);
+  //       transRow.remove();
+  //       updateSummary();
+  //     });
+
+  deleteBtn.addEventListener('click', (element) => {
+    // console.log(element.target.parentNode.parentNode.rowIndex);
+    const rowNumber = element.target.parentNode.parentNode.rowIndex;
+    if (rowNumber > 0) {
+      if (rowNumber === 1) {
+        transactionHistory.deleteRow(-1);
+      } else transactionHistory.deleteRow(rowNumber - 1);
+    }
+
+    updateSummary();
+  });
 
   updateSummary();
 }
