@@ -27,7 +27,8 @@ addExpenseBtn.addEventListener('click', () => {
       expenseDescription.value.trim(),
       expenseCategory.value.trim(),
       expenseAmount.value.trim(),
-      'expense'
+      'expense',
+      false
     );
     expenseDescription.value = '';
     expenseCategory.value = '';
@@ -49,28 +50,23 @@ addIncomeBtn.addEventListener('click', () => {
   } else {
     addTransactions(
       incomeDescription.value.trim(),
-      'income',
+      'Income',
       incomeAmount.value.trim(),
-      'income'
+      'income',
+      false
     );
   }
   incomeAmount.value = '';
   incomeDescription.value = '';
 });
 
-function addTransactions(description, category = '', amount, type) {
-  // save data to localStorage to preserve data after page is refreshed
-  const transaction = {
-    description: description,
-    amount: amount,
-    category: category,
-    type: type,
-  };
-
-  let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-  transactions.push(transaction);
-  localStorage.setItem('transactions', JSON.stringify(transactions));
-
+function addTransactions(
+  description,
+  category = '',
+  amount,
+  type,
+  inLocalStorage = true
+) {
   let noOfTransactions = transactionHistory.rows.length;
   noOfTransactions += 1;
   const transRow = document.createElement('tr');
@@ -96,9 +92,42 @@ function addTransactions(description, category = '', amount, type) {
   transRow.appendChild(actionColumn);
 
   transactionHistory.appendChild(transRow);
+  //   save transaction to localStorage
+  const transaction = {
+    description: description,
+    category: category,
+    amount: amount,
+    type: type,
+  };
+  if (!inLocalStorage) {
+    saveTransaction(transaction);
+  }
   deleteBtn.addEventListener('click', (element) => {
     // console.log(element.target.parentNode.parentNode.rowIndex);
-    console.log(element.target.parentNode.parentNode[0]);
+    const tableRow = element.target.parentNode.parentNode;
+    const transactionToBeRemoved = {
+      description: '',
+      amount: '',
+      category: '',
+      type: '',
+    };
+    for (let i = 0; i < tableRow.cells.length; i++) {
+      //   console.log(tableRow.cells[i].textContent);
+      switch (i) {
+        case 1:
+          transactionToBeRemoved.description = tableRow.cells[i].textContent;
+        case 2:
+          transactionToBeRemoved.amount = tableRow.cells[i].textContent;
+        case 3:
+          transactionToBeRemoved.category = tableRow.cells[i].textContent;
+        case 4:
+          transactionToBeRemoved.type = tableRow.cells[i].textContent;
+      }
+    }
+
+    console.log(transactionToBeRemoved);
+    removeTransaction(transactionToBeRemoved);
+
     // removeTransaction(element.target.parentNode.parentNode)
     const rowNumber = element.target.parentNode.parentNode.rowIndex;
     if (rowNumber > 0) {
@@ -171,11 +200,11 @@ function showNotification(message) {
 function removeTransaction(transactionToRemove) {
   let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
   transactions = transactions.filter(function (transaction) {
-    return !(
-      transaction.description === transactionToRemove.description &&
-      transaction.amount === transactionToRemove.amount &&
-      transaction.category === transactionToRemove.category &&
-      transaction.type === transactionToRemove.type
+    return (
+      transaction.description !== transactionToRemove.description &&
+      transaction.amount !== transactionToRemove.amount &&
+      transaction.category !== transactionToRemove.category &&
+      transaction.type !== transactionToRemove.type
     );
   });
   localStorage.setItem('transactions', JSON.stringify(transactions));
@@ -190,9 +219,25 @@ function loadTransactions() {
       transaction.description,
       transaction.category,
       transaction.amount,
-      transaction.type
+      transaction.type,
+      true
     );
   });
-  updateSummary();
+  //   updateSummary();
 }
+// function to save transaction to localStorage
+function saveTransaction(transactionToBeAdded) {
+  // save data to localStorage to preserve data after page is refreshed
+  const transaction = {
+    description: transactionToBeAdded.description,
+    amount: transactionToBeAdded.amount,
+    category: transactionToBeAdded.category,
+    type: transactionToBeAdded.type,
+  };
+
+  let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  transactions.push(transaction);
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+}
+
 window.addEventListener('load', loadTransactions);
