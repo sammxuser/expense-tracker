@@ -82,7 +82,11 @@ function addTransactions(
   const actionColumn = document.createElement('td');
   const deleteBtn = document.createElement('button');
   deleteBtn.classList.add('delete-btn');
-  deleteBtn.textContent = 'delete';
+  // deleteBtn.textContent = 'delete';
+  const italicIcon = document.createElement('i');
+  italicIcon.classList.add('fas');
+  italicIcon.classList.add('fa-trash');
+  deleteBtn.appendChild(italicIcon);
   actionColumn.appendChild(deleteBtn);
 
   transRow.appendChild(descColumn);
